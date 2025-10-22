@@ -1,0 +1,227 @@
+function Main.drawBox 0
+push argument 0
+push argument 1
+push argument 2
+push argument 1
+push argument 4
+add
+push constant 1
+sub
+call Screen.drawRectangle 4
+pop temp 0
+push argument 0
+push argument 3
+push argument 4
+sub
+push constant 1
+add
+push argument 2
+push argument 3
+call Screen.drawRectangle 4
+pop temp 0
+push argument 0
+push argument 1
+push argument 0
+push argument 4
+add
+push constant 1
+sub
+push argument 3
+call Screen.drawRectangle 4
+pop temp 0
+push argument 2
+push argument 4
+sub
+push constant 1
+add
+push argument 1
+push argument 2
+push argument 3
+call Screen.drawRectangle 4
+pop temp 0
+push constant 0
+return
+function Main.drawPlayerLife 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 0
+push constant 38
+call Output.moveCursor 2
+pop temp 0
+push constant 10
+call String.new 1
+push constant 69
+call String.appendChar 2
+push constant 68
+call String.appendChar 2
+push constant 73
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 72
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 58
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+push argument 0
+push constant 10
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+call Output.printInt 1
+pop temp 0
+label IF_FALSE0
+push argument 0
+call Output.printInt 1
+pop temp 0
+push constant 0
+return
+function Main.drawBossLife 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 0
+push constant 0
+call Output.moveCursor 2
+pop temp 0
+push constant 11
+call String.new 1
+push constant 74
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 99
+call String.appendChar 2
+push constant 107
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 72
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 58
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+push argument 0
+push constant 10
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+call Output.printInt 1
+pop temp 0
+label IF_FALSE0
+push argument 0
+call Output.printInt 1
+pop temp 0
+push constant 0
+return
+function Main.playerDamage 1
+push argument 0
+push argument 1
+sub
+pop local 0
+push local 0
+call Main.drawPlayerLife 1
+pop temp 0
+push local 0
+return
+function Main.bossDamage 1
+push argument 0
+push argument 1
+sub
+pop local 0
+push local 0
+call Main.drawBossLife 1
+pop temp 0
+push local 0
+return
+function Main.main 7
+push constant 230
+pop local 0
+push constant 38
+pop local 1
+push constant 470
+pop local 2
+push constant 221
+pop local 3
+push constant 2
+pop local 4
+push constant 20
+pop local 5
+push constant 30
+pop local 6
+call Screen.clearScreen 0
+pop temp 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push local 0
+push local 1
+push local 2
+push local 3
+push local 4
+call Main.drawBox 5
+pop temp 0
+push local 5
+call Main.drawPlayerLife 1
+pop temp 0
+push local 6
+call Main.drawBossLife 1
+pop temp 0
+push constant 1000
+call Sys.wait 1
+pop temp 0
+push local 5
+push constant 3
+call Main.playerDamage 2
+pop local 5
+push constant 1000
+call Sys.wait 1
+pop temp 0
+push local 5
+push constant 3
+call Main.playerDamage 2
+pop local 5
+push constant 1000
+call Sys.wait 1
+pop temp 0
+push local 5
+push constant 3
+call Main.playerDamage 2
+pop local 5
+push constant 1000
+call Sys.wait 1
+pop temp 0
+push local 5
+push constant 3
+call Main.playerDamage 2
+pop local 5
+call Sys.halt 0
+pop temp 0
+push constant 0
+return

@@ -1,0 +1,85 @@
+/** Main.jack — dibuja HUD y caja de combate 100x80 */
+class Main {
+
+    /** Subrutina estática: dibuja un marco con grosor t */
+    function void drawBox(int x1, int y1, int x2, int y2, int t) {
+        // Top
+        do Screen.drawRectangle(x1, y1, x2, y1 + t - 1);
+        // Bottom
+        do Screen.drawRectangle(x1, y2 - t + 1, x2, y2);
+        // Left
+        do Screen.drawRectangle(x1, y1, x1 + t - 1, y2);
+        // Right
+        do Screen.drawRectangle(x2 - t + 1, y1, x2, y2);
+        return;
+    }
+
+    function void drawPlayerLife(int life){
+        do Screen.setColor(true);
+        do Output.moveCursor(0,38);
+        do Output.printString("EDI - HP: ");
+        if (life < 10){
+            do Output.printInt(0);
+        }
+        do Output.printInt(life);
+        return;
+    }
+
+    function void drawBossLife(int life){
+        do Screen.setColor(true);
+        do Output.moveCursor(0, 0);
+        do Output.printString("Jack - HP: ");
+        if (life < 10){
+            do Output.printInt(0);
+        }
+        do Output.printInt(life);
+        return;
+    }
+
+    function int playerDamage(int actualLife, int damage){
+        var int newLife;
+        let newLife = actualLife - damage;
+        do Main.drawPlayerLife(newLife);
+        return newLife;
+    }
+
+    function int bossDamage(int actualLife, int damage){
+        var int newLife;
+        let newLife = actualLife - damage;
+        do Main.drawBossLife(newLife);
+        return newLife;
+    }
+
+    function void main() {
+        var int boxX1, boxY1, boxX2, boxY2, thickness, playerLife, bossLife;
+
+        let boxX1 = 230;
+        let boxY1 = 38;
+        let boxX2 = 470;    // 240
+        let boxY2 = 221;    // 180
+        let thickness = 2;
+        let playerLife = 20;
+        let bossLife = 30;
+
+        do Screen.clearScreen();
+        do Screen.setColor(true);
+        do Main.drawBox(boxX1, boxY1, boxX2, boxY2, thickness);
+
+        do Main.drawPlayerLife(playerLife);
+        do Main.drawBossLife(bossLife);
+
+        do Sys.wait(1000);
+
+        let playerLife = Main.playerDamage(playerLife,3);
+
+        do Sys.wait(1000);
+        let playerLife = Main.playerDamage(playerLife,3);
+        do Sys.wait(1000);
+        let playerLife = Main.playerDamage(playerLife,3);
+        do Sys.wait(1000);
+        let playerLife = Main.playerDamage(playerLife,3);
+
+        do Sys.halt();
+        return;
+    }
+}
