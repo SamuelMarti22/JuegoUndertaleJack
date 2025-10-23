@@ -50,34 +50,146 @@ class Main {
         return newLife;
     }
 
+    function void drawPlayer(int playerX1, int playerY1){
+
+        var int playerTamano;
+        let playerTamano = 10;
+
+        do Screen.setColor(true);
+        do Screen.drawRectangle(playerX1, playerY1, playerX1 + playerTamano - 1, playerY1 + playerTamano - 1);
+
+        return;
+    }
+
+    function void eraseplayer(int playerX1, int playerY1){
+        var int playerTamano;
+        let playerTamano = 10;
+        do Screen.setColor(false);
+        do Screen.drawRectangle(playerX1, playerY1, playerX1 + playerTamano - 1, playerY1 + playerTamano - 1);
+
+        return;
+    }
+
     function void main() {
         var int boxX1, boxY1, boxX2, boxY2, thickness, playerLife, bossLife;
+        var int playerX1, playerY1;
+        var boolean activeKeyboard;
+        var int readKeyboard, step, minX, minY, maxX, maxY;
+        var int prevKey, cooldown, repeatDelay;
 
+        // Variables manejo del teclado
+        let activeKeyboard  = true;
+        let step = 1;
+        let prevKey = 0;
+        let cooldown = 0;
+        let repeatDelay = 5;
+
+        // Variables para el tablero
         let boxX1 = 230;
         let boxY1 = 38;
         let boxX2 = 470;    // 240
         let boxY2 = 221;    // 180
         let thickness = 2;
+
+        // Variables de vida del jefe
         let playerLife = 20;
         let bossLife = 30;
 
+        // Dibujar tablero
         do Screen.clearScreen();
         do Screen.setColor(true);
         do Main.drawBox(boxX1, boxY1, boxX2, boxY2, thickness);
 
+        // Dibujar vida del jefe y del jugador
         do Main.drawPlayerLife(playerLife);
         do Main.drawBossLife(bossLife);
 
-        do Sys.wait(1000);
+        // Variables iniciales del sprite del jugador
+        let playerX1 = 233;
+        let playerY1 = 41;
 
-        let playerLife = Main.playerDamage(playerLife,3);
 
-        do Sys.wait(1000);
-        let playerLife = Main.playerDamage(playerLife,3);
-        do Sys.wait(1000);
-        let playerLife = Main.playerDamage(playerLife,3);
-        do Sys.wait(1000);
-        let playerLife = Main.playerDamage(playerLife,3);
+        // Maximos del tablero para el movimiento 
+        let minX = boxX1 + 3;
+        let maxX = boxX2 - 12;
+        let minY = boxY1 + 3;
+        let maxY = boxY2 - 12;
+
+        do Screen.setColor(true);
+        do Main.drawPlayer(playerX1,playerY1);
+
+
+        while (activeKeyboard){
+              if (~(readKeyboard = 0) & ~(readKeyboard = prevKey)) {
+                let cooldown = 0;
+            }
+
+            if (cooldown > 0) { let cooldown = cooldown - 1; }
+
+            let readKeyboard = Keyboard.keyPressed();
+
+        // Left
+
+            if (readKeyboard = 130){
+                    if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+
+                    let playerX1 = playerX1 - step;
+                    if (playerX1 < minX) { let playerX1 = minX; } // límite de pantalla
+
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay; // espera unos frames antes del próximo paso
+                }   
+            }
+
+         // Up
+            if (readKeyboard = 131){
+            
+                // si es la primera vez de la pulsación (prevKey != 132) O ya venció el cooldown
+                if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+
+                    let playerY1 = playerY1 - step;
+                    if (playerY1 < minY) { let playerY1 = minY; } // límite de pantalla
+
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay; // espera unos frames antes del próximo paso
+                }   
+            }
+        
+         // Right
+            if (readKeyboard = 132) {
+            // si es la primera vez de la pulsación (prevKey != 132) O ya venció el cooldown
+              if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+
+                    let playerX1 = playerX1 + step;
+                    if (playerX1 > maxX) { let playerX1 = maxX; } // límite de pantalla
+
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay; // espera unos frames antes del próximo paso
+                }   
+            }
+        
+         // Down
+            if (readKeyboard = 133){
+                  // si es la primera vez de la pulsación (prevKey != 132) O ya venció el cooldown
+                  if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+
+                    let playerY1 = playerY1 + step;
+                    if (playerY1 > maxY) { let playerY1 = maxY; } // límite de pantalla
+
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay; // espera unos frames antes del próximo paso
+                }  
+            }
+        
+            let prevKey = readKeyboard;
+            do Sys.wait(2);
+        }
+
+
 
         do Sys.halt();
         return;
