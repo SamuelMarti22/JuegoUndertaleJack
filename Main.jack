@@ -1,7 +1,6 @@
-/** Main.jack — dibuja HUD y caja de combate 100x80 */
 class Main {
 
-    /** Subrutina estática: dibuja un marco con grosor t */
+    
     function void drawBox(int x1, int y1, int x2, int y2, int t) {
         // Top
         do Screen.drawRectangle(x1, y1, x2, y1 + t - 1);
@@ -48,6 +47,49 @@ class Main {
         let newLife = actualLife - damage;
         do Main.drawBossLife(newLife);
         return newLife;
+    }
+
+    function void drawPlayer(int playerX1, int playerY1) {
+        var int xAligned, loc, base;
+
+        let xAligned = 2 * (playerX1 / 2);
+        let xAligned = 16 * (xAligned / 16);
+
+        let loc  = (playerY1 * 32) + (xAligned / 16);
+        let base = 16384 + loc;
+
+       
+        do Memory.poke(base     , 108);   // 01101100
+        do Memory.poke(base +  32, 254);   // 11111110
+        do Memory.poke(base +  64, 254);   // 11111110
+        do Memory.poke(base +  96, 254);   // 11111110
+        do Memory.poke(base + 128, 124);   // 01111100
+        do Memory.poke(base + 160, 56);    // 00111000
+        do Memory.poke(base + 192, 16);    // 00010000
+        do Memory.poke(base + 224, 16);    // 00010000
+        do Memory.poke(base + 224, 0);     // 00000000
+        return;
+    }
+
+    function void eraseplayer(int playerX1, int playerY1) {
+        var int xAligned, loc, base;
+
+        let xAligned = 2 * (playerX1 / 2);
+        let xAligned = 16 * (xAligned / 16);
+        let loc  = (playerY1 * 32) + (xAligned / 16);
+        let base = 16384 + loc;
+
+        do Memory.poke(base      , 0);
+        do Memory.poke(base +  32, 0);
+        do Memory.poke(base +  64, 0);
+        do Memory.poke(base +  96, 0);
+        do Memory.poke(base + 128, 0);
+        do Memory.poke(base + 160, 0);
+        do Memory.poke(base + 192, 0);
+        do Memory.poke(base + 224, 0);
+        do Memory.poke(base + 256, 0); 
+
+        return;
     }
 
     function void drawBoss(int location) {
@@ -177,33 +219,108 @@ class Main {
 
     function void main() {
         var int boxX1, boxY1, boxX2, boxY2, thickness, playerLife, bossLife;
+        var int playerX1, playerY1;
+        var boolean activeKeyboard;
+        var int readKeyboard, step, minX, minY, maxX, maxY;
+        var int prevKey, cooldown, repeatDelay;
 
+        // Variables manejo del teclado
+        let activeKeyboard  = true;
+        let step = 2;        
+        let prevKey = 0;
+        let cooldown = 0;
+        let repeatDelay = 3;  
+
+        // Variables para el tablero
         let boxX1 = 230;
         let boxY1 = 38;
-        let boxX2 = 470;    // 240
-        let boxY2 = 221;    // 180
+        let boxX2 = 470;
+        let boxY2 = 221;
         let thickness = 2;
+
+        // Variables de vida
         let playerLife = 20;
         let bossLife = 30;
 
+        // Dibujar tablero
         do Screen.clearScreen();
         do Screen.setColor(true);
         do Main.drawBox(boxX1, boxY1, boxX2, boxY2, thickness);
         do Main.drawBoss(300);
 
+        // Dibujar vida del jefe y del jugador
         do Main.drawPlayerLife(playerLife);
         do Main.drawBossLife(bossLife);
 
-        do Sys.wait(1000);
+        // Variables iniciales del sprite del jugador
+        let playerX1 = 350;
+        let playerY1 = 50;
 
-        let playerLife = Main.playerDamage(playerLife,3);
+        // Límites del tablero
+        let minX = boxX1 + 10;
+        let minX = 2 * ((minX + 1) / 2);   
 
-        do Sys.wait(1000);
-        let playerLife = Main.playerDamage(playerLife,3);
-        do Sys.wait(1000);
-        let playerLife = Main.playerDamage(playerLife,3);
-        do Sys.wait(1000);
-        let playerLife = Main.playerDamage(playerLife,3);
+        let maxX = boxX2 - 8 - 3;          
+        let maxX = 2 * (maxX / 2);         
+
+        let minY = boxY1 + 3;
+        let maxY = boxY2 - 9 - 3;          
+
+        do Screen.setColor(true);
+        do Main.drawPlayer(playerX1, playerY1);
+
+        while (activeKeyboard){
+            let readKeyboard = Keyboard.keyPressed();
+            if (~(readKeyboard = 0) & ~(readKeyboard = prevKey)) { let cooldown = 0; }
+            if (cooldown > 0) { let cooldown = cooldown - 1; }
+
+            // Left
+            if (readKeyboard = 130){
+                if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+                    let playerX1 = playerX1 - step;
+                    if (playerX1 < minX) { let playerX1 = minX; }
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay;
+                }   
+            }
+
+            // Up
+            if (readKeyboard = 131){
+                if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+                    let playerY1 = playerY1 - step;
+                    if (playerY1 < minY) { let playerY1 = minY; }
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay;
+                }   
+            }
+        
+            // Right
+            if (readKeyboard = 132) {
+                if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+                    let playerX1 = playerX1 + step;
+                    if (playerX1 > maxX) { let playerX1 = maxX; }
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay;
+                }   
+            }
+        
+            // Down
+            if (readKeyboard = 133){
+                if (cooldown = 0) {  
+                    do Main.eraseplayer(playerX1, playerY1);
+                    let playerY1 = playerY1 + step;
+                    if (playerY1 > maxY) { let playerY1 = maxY; }
+                    do Main.drawPlayer(playerX1, playerY1);
+                    let cooldown = repeatDelay;
+                }  
+            }
+        
+            let prevKey = readKeyboard;
+            do Sys.wait(2);
+        }
 
         do Sys.halt();
         return;
