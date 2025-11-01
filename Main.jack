@@ -246,7 +246,7 @@ class Main {
         do Screen.clearScreen();
         do Screen.setColor(true);
         do Main.drawBox(boxX1, boxY1, boxX2, boxY2, thickness);
-        do Main.drawBoss(300);
+        do Main.drawBoss(2950);
 
         // Dibujar vida del jefe y del jugador
         do Main.drawPlayerLife(playerLife);
