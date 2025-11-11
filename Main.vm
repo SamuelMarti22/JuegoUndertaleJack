@@ -139,6 +139,473 @@ call Output.printInt 1
 pop temp 0
 push constant 0
 return
+function Main.drawAttacks 2
+push argument 1
+push constant 32
+call Math.multiply 2
+push argument 0
+push constant 16
+call Math.divide 2
+add
+pop local 0
+push constant 16384
+push local 0
+add
+pop local 1
+push local 1
+push constant 32
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 32
+add
+push constant 112
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 64
+add
+push constant 112
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 96
+add
+push constant 248
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 128
+add
+push constant 248
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 160
+add
+push constant 508
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 192
+add
+push constant 476
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 224
+add
+push constant 990
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 256
+add
+push constant 942
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 288
+add
+push constant 1967
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 320
+add
+push constant 1911
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 352
+add
+push constant 886
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 384
+add
+push constant 942
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 416
+add
+push constant 476
+call Memory.poke 2
+pop temp 0
+push local 1
+push constant 448
+add
+push constant 248
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Main.makePlayerRows 1
+push constant 9
+call Array.new 1
+pop local 0
+push constant 0
+push local 0
+add
+push constant 108
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 254
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 254
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push local 0
+add
+push constant 254
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 4
+push local 0
+add
+push constant 124
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+push local 0
+add
+push constant 56
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 6
+push local 0
+add
+push constant 16
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 0
+add
+push constant 16
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 0
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+return
+function Main.makeAttackRows 1
+push constant 15
+call Array.new 1
+pop local 0
+push constant 0
+push local 0
+add
+push constant 32
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push constant 112
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 0
+add
+push constant 112
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push local 0
+add
+push constant 248
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 4
+push local 0
+add
+push constant 248
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+push local 0
+add
+push constant 508
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 6
+push local 0
+add
+push constant 476
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 0
+add
+push constant 990
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 0
+add
+push constant 942
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 9
+push local 0
+add
+push constant 1967
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 10
+push local 0
+add
+push constant 1911
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 11
+push local 0
+add
+push constant 886
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 12
+push local 0
+add
+push constant 942
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 13
+push local 0
+add
+push constant 476
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 14
+push local 0
+add
+push constant 248
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+return
+function Main.collideAligned16 6
+push argument 0
+push constant 16
+call Math.divide 2
+push argument 3
+push constant 16
+call Math.divide 2
+eq
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push argument 2
+call Array.length 1
+pop local 0
+push argument 5
+call Array.length 1
+pop local 1
+push argument 1
+pop local 2
+push argument 4
+push local 2
+gt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push argument 4
+pop local 2
+label IF_FALSE1
+push argument 1
+push local 0
+add
+push constant 1
+sub
+pop local 3
+push argument 4
+push local 1
+add
+push constant 1
+sub
+push local 3
+lt
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push argument 4
+push local 1
+add
+push constant 1
+sub
+pop local 3
+label IF_FALSE2
+push local 2
+push local 3
+gt
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 0
+return
+label IF_FALSE3
+label WHILE_EXP0
+push local 2
+push local 3
+gt
+not
+not
+if-goto WHILE_END0
+push local 2
+push argument 1
+sub
+pop local 4
+push local 2
+push argument 4
+sub
+pop local 5
+push local 4
+push argument 2
+add
+pop pointer 1
+push that 0
+push local 5
+push argument 5
+add
+pop pointer 1
+push that 0
+and
+push constant 0
+eq
+not
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 0
+not
+return
+label IF_FALSE4
+push local 2
+push constant 1
+add
+pop local 2
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Main.collideSweepDownAligned16 2
+push argument 5
+push constant 0
+gt
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 0
+push argument 1
+push argument 2
+push argument 3
+push argument 4
+push argument 6
+call Main.collideAligned16 6
+return
+label IF_FALSE0
+push constant 1
+pop local 0
+label WHILE_EXP0
+push local 0
+push argument 5
+gt
+not
+not
+if-goto WHILE_END0
+push argument 4
+push local 0
+add
+pop local 1
+push argument 0
+push argument 1
+push argument 2
+push argument 3
+push local 1
+push argument 6
+call Main.collideAligned16 6
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+not
+return
+label IF_FALSE1
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
 function Main.playerDamage 1
 push argument 0
 push argument 1
@@ -317,7 +784,7 @@ call Memory.poke 2
 pop temp 0
 push constant 0
 return
-function Main.main 19
+function Main.main 29
 push constant 0
 not
 pop local 9
@@ -408,10 +875,197 @@ push local 7
 push local 8
 call Main.drawPlayer 2
 pop temp 0
+push constant 6
+pop local 24
+push constant 0
+pop local 27
+push local 24
+call Array.new 1
+pop local 21
+push local 24
+call Array.new 1
+pop local 22
+push local 24
+call Array.new 1
+pop local 23
+call Main.makePlayerRows 0
+pop local 25
+call Main.makeAttackRows 0
+pop local 26
+push constant 0
+push local 21
+add
+push constant 256
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+push local 22
+add
+push constant 60
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+push local 23
+add
+push constant 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 21
+add
+push constant 272
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 22
+add
+push constant 40
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 23
+add
+push constant 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 21
+add
+push constant 288
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 22
+add
+push constant 80
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 23
+add
+push constant 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push local 21
+add
+push constant 304
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push local 22
+add
+push constant 20
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push local 23
+add
+push constant 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 4
+push local 21
+add
+push constant 320
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 4
+push local 22
+add
+push constant 100
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 4
+push local 23
+add
+push constant 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+push local 21
+add
+push constant 336
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+push local 22
+add
+push constant 50
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+push local 23
+add
+push constant 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+pop local 28
 label WHILE_EXP0
-push local 9
+push local 28
+push local 24
+lt
 not
 if-goto WHILE_END0
+push local 28
+push local 21
+add
+pop pointer 1
+push that 0
+push local 28
+push local 22
+add
+pop pointer 1
+push that 0
+call Main.drawAttacks 2
+pop temp 0
+push local 28
+push constant 1
+add
+pop local 28
+goto WHILE_EXP0
+label WHILE_END0
+label WHILE_EXP1
+push local 9
+not
+if-goto WHILE_END1
 call Keyboard.keyPressed 0
 pop local 10
 push local 10
@@ -593,8 +1247,8 @@ pop local 16
 push constant 2
 call Sys.wait 1
 pop temp 0
-goto WHILE_EXP0
-label WHILE_END0
+goto WHILE_EXP1
+label WHILE_END1
 call Sys.halt 0
 pop temp 0
 push constant 0
