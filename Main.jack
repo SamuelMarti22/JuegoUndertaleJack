@@ -101,8 +101,8 @@ function boolean collideAligned16(int x1, int y1, Array r1, int x2, int y2, Arra
     // Si NO están en la misma columna de palabra (x múltiplos de 16), salir
     if (~((x1 / 16) = (x2 / 16))) { return false; }
 
-    let h1 = r1.length();
-    let h2 = r2.length();
+    let h1 = 6;
+    let h2 = 6;
 
     // Rango vertical común
     let yStart = y1;           if (y2 > yStart) { let yStart = y2; }
@@ -202,6 +202,20 @@ function boolean collideSweepDownAligned16(
 
         return;
     }
+
+    /** Borra un rectángulo 16xH (útil para “borrar sprite”). */
+function void clear16xH(int x, int y, int h) {
+    do Screen.setColor(false);
+    do Screen.drawRectangle(x, y, x + 15, y + h - 1);
+    do Screen.setColor(true);
+    return;
+}
+
+/** Borra la gota (alto 15). */
+function void eraseAttack(int x, int y) {
+    do Main.clear16xH(x, y, 15);
+    return;
+}
 
     function void drawBoss(int location) {
 	    var int memAddress; 
@@ -348,6 +362,7 @@ function boolean collideSweepDownAligned16(
 
         // Variables auxiliares 
         var int i;
+        var int atkCount;
 
         // Variables manejo del teclado
         let activeKeyboard  = true;
@@ -378,7 +393,7 @@ function boolean collideSweepDownAligned16(
         do Main.drawBossLife(bossLife);
 
         // Variables iniciales del sprite del jugador
-        let playerX1 = 350;
+        let playerX1 = 450;
         let playerY1 = 50;
 
         // Límites del tablero
@@ -405,13 +420,15 @@ function boolean collideSweepDownAligned16(
         let playerRows = Main.makePlayerRows();
         let attackRows = Main.makeAttackRows();
 
+        let atkCount = dropsCount; 
+
         // Posiciones iniciales (X múltiplos de 16, dentro del tablero)
-        let atkX[0] = 256;  let atkY[0] =  60;  let atkVy[0] = 2;
-        let atkX[1] = 272;  let atkY[1] =  40;  let atkVy[1] = 3;
-        let atkX[2] = 288;  let atkY[2] =  80;  let atkVy[2] = 2;
-        let atkX[3] = 304;  let atkY[3] =  120;  let atkVy[3] = 3;
-        let atkX[4] = 320;  let atkY[4] = 100;  let atkVy[4] = 2;
-        let atkX[5] = 336;  let atkY[5] =  50;  let atkVy[5] = 3;
+        let atkX[0] = 236;  let atkY[0] =  60;  let atkVy[0] = 1;
+        let atkX[1] = 260;  let atkY[1] =  40;  let atkVy[1] = 1;
+        let atkX[2] = 290;  let atkY[2] =  80;  let atkVy[2] = 1;
+        let atkX[3] = 330;  let atkY[3] =  120;  let atkVy[3] = 1;
+        let atkX[4] = 390;  let atkY[4] = 100;  let atkVy[4] = 1;
+        let atkX[5] = 430;  let atkY[5] =  50;  let atkVy[5] = 1;
 
         // Dibujo inicial de las 6 gotas
         let i = 0;
@@ -468,6 +485,49 @@ function boolean collideSweepDownAligned16(
                     let cooldown = repeatDelay;
                 }  
             }
+
+            // Actualizamos la posición previa del jugador para el siguiente ciclo
+            let prevPlayerX = playerX1;
+            let prevPlayerY = playerY1;
+
+    let i = 0;
+    while (i < atkCount) {
+        // Borrar la gota en su posición anterior
+        do Main.eraseAttack(atkX[i], atkY[i]);
+
+        // Actualizar la posición de la gota
+        let atkY[i] = atkY[i] + atkVy[i];
+
+        // Si la gota ha salido de la pantalla, hacer respawn en la parte superior
+        if (atkY[i] > (boxY2 - 15)) {
+            let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
+        }
+
+        // Comprobar colisión con el jugador
+        if (Main.collideSweepDownAligned16(playerX1, playerY1, playerRows, atkX[i], atkY[i], atkVy[i], attackRows)) {
+            // Si hay colisión, borrar la gota y reaparecer en la parte superior
+            let playerLife = Main.playerDamage(playerLife, 3);
+            do Main.eraseAttack(atkX[i], atkY[i]);  // Borra la gota
+            let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
+        }
+
+        // Redibujar la gota
+        do Main.drawAttacks(atkX[i], atkY[i]);
+    
+        // Borra al jugador solo si se mueve
+        if (~(playerX1 = prevPlayerX) | ~(playerY1 = prevPlayerY)) {
+            do Main.eraseplayer(prevPlayerX, prevPlayerY);
+        }
+
+        // Redibujar al jugador al final
+        do Main.drawPlayer(playerX1, playerY1);
+
+        // Actualiza la posición previa del jugador
+        let prevPlayerX = playerX1;
+        let prevPlayerY = playerY1;
+
+        let i = i + 1;
+    }
         
             let prevKey = readKeyboard;
             do Sys.wait(2);
