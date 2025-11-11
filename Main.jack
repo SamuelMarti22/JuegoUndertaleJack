@@ -423,12 +423,12 @@ function void eraseAttack(int x, int y) {
         let atkCount = dropsCount; 
 
         // Posiciones iniciales (X múltiplos de 16, dentro del tablero)
-        let atkX[0] = 236;  let atkY[0] =  60;  let atkVy[0] = 1;
-        let atkX[1] = 260;  let atkY[1] =  40;  let atkVy[1] = 1;
-        let atkX[2] = 290;  let atkY[2] =  80;  let atkVy[2] = 1;
-        let atkX[3] = 330;  let atkY[3] =  120;  let atkVy[3] = 1;
-        let atkX[4] = 390;  let atkY[4] = 100;  let atkVy[4] = 1;
-        let atkX[5] = 430;  let atkY[5] =  50;  let atkVy[5] = 1;
+        let atkX[0] = 256;  let atkY[0] =  60;  let atkVy[0] = 1;
+        let atkX[1] = 272;  let atkY[1] =  40;  let atkVy[1] = 1;
+        let atkX[2] = 288;  let atkY[2] =  80;  let atkVy[2] = 1;
+        let atkX[3] = 304;  let atkY[3] =  120;  let atkVy[3] = 1;
+        let atkX[4] = 320;  let atkY[4] = 100;  let atkVy[4] = 1;
+        let atkX[5] = 336;  let atkY[5] =  50;  let atkVy[5] = 1;
 
         // Dibujo inicial de las 6 gotas
         let i = 0;
