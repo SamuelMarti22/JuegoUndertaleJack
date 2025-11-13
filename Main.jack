@@ -342,6 +342,110 @@ function void eraseAttack(int x, int y) {
 	    return;
     }
 
+    /** Muestra el indicador del modo actual */
+    function void drawModeIndicator(boolean isBossMode) {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 220, 100, 255);
+        do Screen.setColor(true);
+        do Output.moveCursor(21, 0);
+        if (isBossMode) {
+            do Output.printString("Modo: B");
+        } else {
+            do Output.printString("Modo: P");
+        }
+        return;
+    }
+
+    /** Dibuja la barra horizontal en modo jugador */
+    function void drawPlayerBar(int x1, int y, int x2, int thickness) {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x1, y, x2, y + thickness - 1);
+        return;
+    }
+
+    /** Borra la barra horizontal en modo jugador */
+    function void erasePlayerBar(int x1, int y, int x2, int thickness) {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x1, y, x2, y + thickness - 1);
+        do Screen.setColor(true);
+        return;
+    }
+
+    /** Cambia al modo jefe: muestra ataques y permite esquivarlos */
+    function void switchToBossMode(Array atkX, Array atkY, int dropsCount, int boxX1, int boxY1) {
+        var int i;
+        // Limpiar el área del tablero (borrar todo dentro)
+        do Screen.setColor(false);
+        do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX1 + 238, boxY1 + 181);
+        do Screen.setColor(true);
+        
+        // Redibujar todos los ataques
+        let i = 0;
+        while (i < dropsCount) {
+            do Main.drawAttacks(atkX[i], atkY[i]);
+            let i = i + 1;
+        }
+        
+        // Actualizar indicador
+        do Main.drawModeIndicator(true);
+        return;
+    }
+
+    /** Cambia al modo jugador: solo muestra la caja vacía */
+    function void switchToPlayerMode(int boxX1, int boxY1, int boxX2, int boxY2, int barX1, int barY, int barX2, int barThickness) {
+        // Limpiar todo el área dentro del tablero
+        do Screen.setColor(false);
+        do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX2 - 2, boxY2 - 2);
+        do Screen.setColor(true);
+        
+        // Dibujar la barra inicial
+        do Main.drawPlayerBar(barX1, barY, barX2, barThickness);
+        
+        // Actualizar indicador
+        do Main.drawModeIndicator(false);
+        return;
+    }
+
+    /** Resetea el estado de la barra cuando se entra al modo jugador */
+    function void resetBarState() {
+        // Esta función será llamada para resetear el estado (se hará desde main)
+        return;
+    }
+
+    /** Calcula el daño basado en la posición de la barra (más centrado = más daño) */
+    function int calculateDamage(int barY, int boxY1, int boxY2, int barThickness) {
+        var int centerY, distance, maxDistance, damage;
+        
+        // Calcular el centro del tablero
+        let centerY = boxY1 + ((boxY2 - boxY1) / 2);
+        
+        // Calcular el centro de la barra
+        let barY = barY + (barThickness / 2);
+        
+        // Calcular distancia al centro (valor absoluto)
+        let distance = barY - centerY;
+        if (distance < 0) {
+            let distance = -distance;
+        }
+        
+        // La distancia máxima es la mitad de la altura del tablero
+        let maxDistance = (boxY2 - boxY1) / 2;
+        
+        // Calcular daño: 10 si está en el centro exacto, menos mientras más lejos
+        // damage = 10 - (distance * 9 / maxDistance)
+        let damage = 10 - ((distance * 9) / maxDistance);
+        
+        // Asegurar que el daño esté entre 1 y 10
+        if (damage < 1) {
+            let damage = 1;
+        }
+        if (damage > 10) {
+            let damage = 10;
+        }
+        
+        return damage;
+    }
+
     function void main() {
         var int boxX1, boxY1, boxX2, boxY2, thickness, playerLife, bossLife;
         var int playerX1, playerY1;
@@ -364,12 +468,43 @@ function void eraseAttack(int x, int y) {
         var int i;
         var int atkCount;
 
+        // Variable para controlar el modo (true = modo jefe, false = modo jugador)
+        var boolean isBossMode;
+        var boolean prevUPressed;
+
+        // Variables para la barra en modo jugador
+        var int barY;           // Posición Y de la barra
+        var int barVy;          // Velocidad vertical de la barra
+        var int barThickness;   // Grosor de la barra
+        var int barX1, barX2;   // Límites horizontales de la barra
+        var boolean barStopped; // Si la barra está detenida
+        var int barStopTimer;   // Contador para esperar antes de cambiar de modo
+        var boolean prevSpacePressed; // Para detectar una sola pulsación de espacio
+        var int damage;         // Variable para almacenar el daño calculado
+
+        // Variables de invencibilidad
+        var boolean isInvincible;      // Si el jugador es invencible
+        var int invincibilityTimer;    // Contador de frames de invencibilidad
+
         // Variables manejo del teclado
         let activeKeyboard  = true;
         let step = 2;        
         let prevKey = 0;
         let cooldown = 0;
-        let repeatDelay = 3;  
+        let repeatDelay = 3;
+        let isBossMode = true;  // Empezamos en modo jefe
+        let prevUPressed = false;
+
+        // Inicializar variables de la barra del modo jugador
+        let barThickness = 3;
+        let barVy = 1;  // Velocidad de movimiento (1 píxel por frame)
+        let barStopped = false;
+        let barStopTimer = 0;
+        let prevSpacePressed = false;
+
+        // Inicializar invencibilidad
+        let isInvincible = false;
+        let invincibilityTimer = 0;  
 
         // Variables para el tablero
         let boxX1 = 230;
@@ -404,7 +539,12 @@ function void eraseAttack(int x, int y) {
         let maxX = 2 * (maxX / 2);         
 
         let minY = boxY1 + 3;
-        let maxY = boxY2 - 9 - 3;          
+        let maxY = boxY2 - 9 - 3;
+
+        // Configurar la barra del modo jugador
+        let barX1 = boxX1 + 10;  // Margen izquierdo
+        let barX2 = boxX2 - 10;  // Margen derecho
+        let barY = boxY1 + 10;   // Posición inicial cerca del tope          
 
         do Screen.setColor(true);
         do Main.drawPlayer(playerX1, playerY1);
@@ -437,10 +577,38 @@ function void eraseAttack(int x, int y) {
             let i = i + 1;
         }
 
+        // Mostrar indicador de modo inicial
+        do Main.drawModeIndicator(true);
+
         while (activeKeyboard){
             let readKeyboard = Keyboard.keyPressed();
             if (~(readKeyboard = 0) & ~(readKeyboard = prevKey)) { let cooldown = 0; }
             if (cooldown > 0) { let cooldown = cooldown - 1; }
+
+            // Detectar tecla U (código 117) para cambiar de modo
+            if (readKeyboard = 85) {
+                if (~prevUPressed) {
+                    // Debug: mostrar que se detectó la tecla
+                    do Output.moveCursor(20, 0);
+                    do Output.printString("U presionada!   ");
+                    
+                    if (isBossMode) {
+                        // Cambiar a modo jugador
+                        do Main.switchToPlayerMode(boxX1, boxY1, boxX2, boxY2, barX1, barY, barX2, barThickness);
+                        let isBossMode = false;
+                        // Resetear estado de la barra
+                        let barStopped = false;
+                        let barStopTimer = 0;
+                    } else {
+                        // Cambiar a modo jefe
+                        do Main.switchToBossMode(atkX, atkY, dropsCount, boxX1, boxY1);
+                        let isBossMode = true;
+                    }
+                    let prevUPressed = true;
+                }
+            } else {
+                let prevUPressed = false;
+            }
 
             // Left
             if (readKeyboard = 130){
@@ -490,44 +658,121 @@ function void eraseAttack(int x, int y) {
             let prevPlayerX = playerX1;
             let prevPlayerY = playerY1;
 
-    let i = 0;
-    while (i < atkCount) {
-        // Borrar la gota en su posición anterior
-        do Main.eraseAttack(atkX[i], atkY[i]);
+            // Solo actualizar y dibujar ataques si estamos en modo jefe
+            if (isBossMode) {
+                let i = 0;
+                while (i < atkCount) {
+                    // Borrar la gota en su posición anterior
+                    do Main.eraseAttack(atkX[i], atkY[i]);
 
-        // Actualizar la posición de la gota
-        let atkY[i] = atkY[i] + atkVy[i];
+                    // Actualizar la posición de la gota
+                    let atkY[i] = atkY[i] + atkVy[i];
 
-        // Si la gota ha salido de la pantalla, hacer respawn en la parte superior
-        if (atkY[i] > (boxY2 - 15)) {
-            let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
-        }
+                    // Si la gota ha salido de la pantalla, hacer respawn en la parte superior
+                    if (atkY[i] > (boxY2 - 15)) {
+                        let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
+                    }
 
-        // Comprobar colisión con el jugador
-        if (Main.collideSweepDownAligned16(playerX1, playerY1, playerRows, atkX[i], atkY[i], atkVy[i], attackRows)) {
-            // Si hay colisión, borrar la gota y reaparecer en la parte superior
-            let playerLife = Main.playerDamage(playerLife, 3);
-            do Main.eraseAttack(atkX[i], atkY[i]);  // Borra la gota
-            let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
-        }
+                    // Comprobar colisión con el jugador (solo si NO es invencible)
+                    if (Main.collideSweepDownAligned16(playerX1, playerY1, playerRows, atkX[i], atkY[i], atkVy[i], attackRows)) {
+                        if (~isInvincible) {
+                            // Si hay colisión y no es invencible, aplicar daño
+                            let playerLife = Main.playerDamage(playerLife, 3);
+                            do Main.eraseAttack(atkX[i], atkY[i]);  // Borra la gota
+                            let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
+                            
+                            // Activar invencibilidad por 1 segundo (500 frames * 2ms = 1000ms)
+                            let isInvincible = true;
+                            let invincibilityTimer = 200;
+                        }
+                    }
 
-        // Redibujar la gota
-        do Main.drawAttacks(atkX[i], atkY[i]);
-    
-        // Borra al jugador solo si se mueve
-        if (~(playerX1 = prevPlayerX) | ~(playerY1 = prevPlayerY)) {
-            do Main.eraseplayer(prevPlayerX, prevPlayerY);
-        }
+                    // Redibujar la gota
+                    do Main.drawAttacks(atkX[i], atkY[i]);
+                
+                    // Borra al jugador solo si se mueve
+                    if (~(playerX1 = prevPlayerX) | ~(playerY1 = prevPlayerY)) {
+                        do Main.eraseplayer(prevPlayerX, prevPlayerY);
+                    }
 
-        // Redibujar al jugador al final
-        do Main.drawPlayer(playerX1, playerY1);
+                    // Redibujar al jugador al final
+                    do Main.drawPlayer(playerX1, playerY1);
 
-        // Actualiza la posición previa del jugador
-        let prevPlayerX = playerX1;
-        let prevPlayerY = playerY1;
+                    // Actualiza la posición previa del jugador
+                    let prevPlayerX = playerX1;
+                    let prevPlayerY = playerY1;
 
-        let i = i + 1;
-    }
+                    let i = i + 1;
+                }
+            }
+
+            // Actualizar y dibujar barra en modo jugador
+            if (~isBossMode) {
+                // Detectar tecla ESPACIO (código 32) para detener la barra
+                if (readKeyboard = 32) {
+                    if (~prevSpacePressed & ~barStopped) {
+                        let barStopped = true;
+                        let barStopTimer = 500;  // 500 frames * 2ms = 1000ms = 1 segundo
+                        let prevSpacePressed = true;
+                        
+                        // Calcular el daño según la posición de la barra
+                        let damage = Main.calculateDamage(barY, boxY1, boxY2, barThickness);
+                        
+                        // Aplicar daño al jefe
+                        let bossLife = Main.bossDamage(bossLife, damage);
+                        
+                        // Debug: mostrar el daño aplicado
+                        do Output.moveCursor(19, 0);
+                        do Output.printString("Danio: ");
+                        do Output.printInt(damage);
+                        do Output.printString("     ");
+                    }
+                } else {
+                    let prevSpacePressed = false;
+                }
+
+                // Si la barra está detenida, decrementar el temporizador
+                if (barStopped) {
+                    let barStopTimer = barStopTimer - 1;
+                    
+                    // Cuando el temporizador llega a 0, cambiar a modo jefe
+                    if (barStopTimer < 1) {
+                        do Main.switchToBossMode(atkX, atkY, dropsCount, boxX1, boxY1);
+                        let isBossMode = true;
+                        let barStopped = false;
+                        let barStopTimer = 0;
+                    }
+                } else {
+                    // Solo mover la barra si NO está detenida
+                    // Borrar la barra en su posición actual
+                    do Main.erasePlayerBar(barX1, barY, barX2, barThickness);
+
+                    // Actualizar posición de la barra
+                    let barY = barY + barVy;
+
+                    // Comprobar rebotes en los límites del tablero
+                    if (barY < (boxY1 + 5)) {
+                        let barY = boxY1 + 5;
+                        let barVy = 1;  // Cambiar dirección hacia abajo
+                    }
+                    if (barY > (boxY2 - barThickness - 5)) {
+                        let barY = boxY2 - barThickness - 5;
+                        let barVy = -1;  // Cambiar dirección hacia arriba (negativo)
+                    }
+
+                    // Dibujar la barra en su nueva posición
+                    do Main.drawPlayerBar(barX1, barY, barX2, barThickness);
+                }
+            }
+
+            // Actualizar temporizador de invencibilidad
+            if (isInvincible) {
+                let invincibilityTimer = invincibilityTimer - 1;
+                if (invincibilityTimer < 1) {
+                    let isInvincible = false;
+                    let invincibilityTimer = 0;
+                }
+            }
         
             let prevKey = readKeyboard;
             do Sys.wait(2);
