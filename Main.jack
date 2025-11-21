@@ -1,5 +1,4 @@
 class Main {
-    
     function void drawBox(int x1, int y1, int x2, int y2, int t) {
         // Top
         do Screen.drawRectangle(x1, y1, x2, y1 + t - 1);
@@ -34,122 +33,154 @@ class Main {
         return;
     }
 
+    /** Muestra la pantalla de derrota */
+    function void showGameOver() {
+        do Screen.clearScreen();
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 0, 511, 255);
+        do Screen.setColor(true);
+        do Output.moveCursor(11, 26);
+        do Output.printString("Perdiste");
+        return;
+    }
+
+    /** Muestra la pantalla de victoria */
+    function void showVictory() {
+        do Screen.clearScreen();
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 0, 511, 255);
+        do Screen.setColor(true);
+        do Output.moveCursor(11, 27);
+        do Output.printString("Ganaste");
+        return;
+    }
 
     function void drawAttacks(int x, int y) {
-    var int location, memAddress;
-
-    let location = (y * 32) + (x / 16);  
-    let memAddress = 16384 + location;
-
-    do Memory.poke(memAddress      , 32);
-    do Memory.poke(memAddress +  32, 112);
-    do Memory.poke(memAddress +  64, 112);
-    do Memory.poke(memAddress +  96, 248);
-    do Memory.poke(memAddress + 128, 248);
-    do Memory.poke(memAddress + 160, 508);
-    do Memory.poke(memAddress + 192, 476);
-    do Memory.poke(memAddress + 224, 990);
-    do Memory.poke(memAddress + 256, 942);
-    do Memory.poke(memAddress + 288, 1967);
-    do Memory.poke(memAddress + 320, 1911);
-    do Memory.poke(memAddress + 352, 886);
-    do Memory.poke(memAddress + 384, 942);
-    do Memory.poke(memAddress + 416, 476);
-    do Memory.poke(memAddress + 448, 248);
-    return;
-}
+        var int location, memAddress;
+        let location = (y * 32) + (x / 16);
+        let memAddress = 16384 + location;
+        do Memory.poke(memAddress , 32);
+        do Memory.poke(memAddress + 32, 112);
+        do Memory.poke(memAddress + 64, 112);
+        do Memory.poke(memAddress + 96, 248);
+        do Memory.poke(memAddress + 128, 248);
+        do Memory.poke(memAddress + 160, 508);
+        do Memory.poke(memAddress + 192, 476);
+        do Memory.poke(memAddress + 224, 990);
+        do Memory.poke(memAddress + 256, 942);
+        do Memory.poke(memAddress + 288, 1967);
+        do Memory.poke(memAddress + 320, 1911);
+        do Memory.poke(memAddress + 352, 886);
+        do Memory.poke(memAddress + 384, 942);
+        do Memory.poke(memAddress + 416, 476);
+        do Memory.poke(memAddress + 448, 248);
+        return;
+    }
 
     function Array makePlayerRows() {
-    var Array rows;
-    let rows = Array.new(9);
-    let rows[0] = 108;
-    let rows[1] = 254;
-    let rows[2] = 254;
-    let rows[3] = 254;
-    let rows[4] = 124;
-    let rows[5] = 56;
-    let rows[6] = 16;
-    let rows[7] = 16;
-    let rows[8] = 0;
-    return rows;
-}
-
-function Array makeAttackRows() {
-    var Array rows;
-    let rows = Array.new(15);
-    let rows[0]  = 32;
-    let rows[1]  = 112;
-    let rows[2]  = 112;
-    let rows[3]  = 248;
-    let rows[4]  = 248;
-    let rows[5]  = 508;
-    let rows[6]  = 476;
-    let rows[7]  = 990;
-    let rows[8]  = 942;
-    let rows[9]  = 1967;
-    let rows[10] = 1911;
-    let rows[11] = 886;
-    let rows[12] = 942;
-    let rows[13] = 476;
-    let rows[14] = 248;
-    return rows;
-}
-
-function boolean collideAligned16(int x1, int y1, Array r1, int x2, int y2, Array r2) {
-    var int h1, h2, yStart, yEnd, i1, i2;
-
-    // Si NO están en la misma columna de palabra (x múltiplos de 16), salir
-    if (~((x1 / 16) = (x2 / 16))) { return false; }
-
-    let h1 = 6;
-    let h2 = 6;
-
-    // Rango vertical común
-    let yStart = y1;           if (y2 > yStart) { let yStart = y2; }
-    let yEnd   = y1 + h1 - 1;  if ((y2 + h2 - 1) < yEnd) { let yEnd = y2 + h2 - 1; }
-    if (yStart > yEnd) { return false; }
-
-    // while (yStart <= yEnd) ==> while (~(yStart > yEnd))
-    while (~(yStart > yEnd)) {
-        let i1 = yStart - y1;
-        let i2 = yStart - y2;
-
-        // if ((r1[i1] & r2[i2]) != 0) ==> if (~(((r1[i1] & r2[i2]) = 0)))
-        if (~(((r1[i1] & r2[i2]) = 0))) { return true; }
-
-        let yStart = yStart + 1;
-    }
-    return false;
-}
-
-
-function boolean collideSweepDownAligned16(
-    int playerX, int playerY, Array playerRows,
-    int atkX, int atkYOld, int atkVy, Array attackRows) 
-{
-    var int step, yProbe;
-
-    // if (atkVy <= 0)  ==>  if (~(atkVy > 0))
-    if (~(atkVy > 0)) {
-        return Main.collideAligned16(playerX, playerY, playerRows, atkX, atkYOld, attackRows);
+        var Array rows;
+        let rows = Array.new(9);
+        let rows[0] = 108;
+        let rows[1] = 254;
+        let rows[2] = 254;
+        let rows[3] = 254;
+        let rows[4] = 124;
+        let rows[5] = 56;
+        let rows[6] = 16;
+        let rows[7] = 16;
+        let rows[8] = 0;
+        return rows;
     }
 
-    let step = 1;
-    // while (step <= atkVy)  ==>  while (~(step > atkVy))
-    while (~(step > atkVy)) {
-        let yProbe = atkYOld + step;
-        if (Main.collideAligned16(playerX, playerY, playerRows, atkX, yProbe, attackRows)) {
-            return true;
+    function Array makeAttackRows() {
+        var Array rows;
+        let rows = Array.new(15);
+        let rows[0] = 32;
+        let rows[1] = 112;
+        let rows[2] = 112;
+        let rows[3] = 248;
+        let rows[4] = 248;
+        let rows[5] = 508;
+        let rows[6] = 476;
+        let rows[7] = 990;
+        let rows[8] = 942;
+        let rows[9] = 1967;
+        let rows[10] = 1911;
+        let rows[11] = 886;
+        let rows[12] = 942;
+        let rows[13] = 476;
+        let rows[14] = 248;
+        return rows;
+    }
+
+    function boolean collideAligned16(int x1, int y1, Array r1, int x2, int y2, Array r2) {
+        var int h1, h2, yStart, yEnd, i1, i2;
+        // Si NO están en la misma columna de palabra (x múltiplos de 16), salir
+        if (~((x1 / 16) = (x2 / 16))) {
+            return false;
         }
-        let step = step + 1;
+        let h1 = 6;
+        let h2 = 6;
+        // Rango vertical común
+        let yStart = y1;
+        if (y2 > yStart) {
+            let yStart = y2;
+        }
+        let yEnd = y1 + h1 - 1;
+        if ((y2 + h2 - 1) < yEnd) {
+            let yEnd = y2 + h2 - 1;
+        }
+        if (yStart > yEnd) {
+            return false;
+        }
+        // while (yStart <= yEnd) ==> while (~(yStart > yEnd))
+        while (~(yStart > yEnd)) {
+            let i1 = yStart - y1;
+            let i2 = yStart - y2;
+            // if ((r1[i1] & r2[i2]) != 0) ==> if (~(((r1[i1] & r2[i2]) = 0)))
+            if (~(((r1[i1] & r2[i2]) = 0))) {
+                return true;
+            }
+            let yStart = yStart + 1;
+        }
+        return false;
     }
-    return false;
-}
+
+    function boolean collideSweepDownAligned16(
+        int playerX, int playerY, Array playerRows,
+        int atkX, int atkYOld, int atkVy, Array attackRows)
+    {
+        var int step, yProbe;
+        // if (atkVy <= 0) ==> if (~(atkVy > 0))
+        if (~(atkVy > 0)) {
+            return Main.collideAligned16(playerX, playerY, playerRows,
+                                          atkX, atkYOld, attackRows);
+        }
+        let step = 1;
+        // while (step <= atkVy) ==> while (~(step > atkVy))
+        while (~(step > atkVy)) {
+            let yProbe = atkYOld + step;
+            if (Main.collideAligned16(playerX, playerY, playerRows,
+                                       atkX, yProbe, attackRows)) {
+                return true;
+            }
+            let step = step + 1;
+        }
+        return false;
+    }
 
     function int playerDamage(int actualLife, int damage){
         var int newLife;
         let newLife = actualLife - damage;
         do Main.drawPlayerLife(newLife);
+        
+        // Verificar si el jugador murió
+        if (newLife < 1) {
+            do Main.showGameOver();
+            do Sys.wait(3000);  // Esperar 3 segundos antes de terminar
+            do Sys.halt();
+        }
+        
         return newLife;
     }
 
@@ -157,189 +188,190 @@ function boolean collideSweepDownAligned16(
         var int newLife;
         let newLife = actualLife - damage;
         do Main.drawBossLife(newLife);
+        
+        // Verificar si el jefe murió
+        if (newLife < 1) {
+            do Main.showVictory();
+            do Sys.wait(3000);  // Esperar 3 segundos antes de terminar
+            do Sys.halt();
+        }
+        
         return newLife;
     }
 
     function void drawPlayer(int playerX1, int playerY1) {
         var int xAligned, loc, base;
-
         let xAligned = 2 * (playerX1 / 2);
         let xAligned = 16 * (xAligned / 16);
-
-        let loc  = (playerY1 * 32) + (xAligned / 16);
+        let loc = (playerY1 * 32) + (xAligned / 16);
         let base = 16384 + loc;
-
-       
-        do Memory.poke(base     , 108);   // 01101100
-        do Memory.poke(base +  32, 254);   // 11111110
-        do Memory.poke(base +  64, 254);   // 11111110
-        do Memory.poke(base +  96, 254);   // 11111110
-        do Memory.poke(base + 128, 124);   // 01111100
-        do Memory.poke(base + 160, 56);    // 00111000
-        do Memory.poke(base + 192, 16);    // 00010000
-        do Memory.poke(base + 224, 16);    // 00010000
-        do Memory.poke(base + 224, 0);     // 00000000
+        do Memory.poke(base , 108);       // 01101100
+        do Memory.poke(base + 32, 254);   // 11111110
+        do Memory.poke(base + 64, 254);   // 11111110
+        do Memory.poke(base + 96, 254);   // 11111110
+        do Memory.poke(base + 128, 124);  // 01111100
+        do Memory.poke(base + 160, 56);   // 00111000
+        do Memory.poke(base + 192, 16);   // 00010000
+        do Memory.poke(base + 224, 16);   // 00010000
+        do Memory.poke(base + 224, 0);    // 00000000
         return;
     }
 
     function void eraseplayer(int playerX1, int playerY1) {
         var int xAligned, loc, base;
-
         let xAligned = 2 * (playerX1 / 2);
         let xAligned = 16 * (xAligned / 16);
-        let loc  = (playerY1 * 32) + (xAligned / 16);
+        let loc = (playerY1 * 32) + (xAligned / 16);
         let base = 16384 + loc;
-
-        do Memory.poke(base      , 0);
-        do Memory.poke(base +  32, 0);
-        do Memory.poke(base +  64, 0);
-        do Memory.poke(base +  96, 0);
+        do Memory.poke(base , 0);
+        do Memory.poke(base + 32, 0);
+        do Memory.poke(base + 64, 0);
+        do Memory.poke(base + 96, 0);
         do Memory.poke(base + 128, 0);
         do Memory.poke(base + 160, 0);
         do Memory.poke(base + 192, 0);
         do Memory.poke(base + 224, 0);
-        do Memory.poke(base + 256, 0); 
-
+        do Memory.poke(base + 256, 0);
         return;
     }
 
-    /** Borra un rectángulo 16xH (útil para “borrar sprite”). */
-function void clear16xH(int x, int y, int h) {
-    do Screen.setColor(false);
-    do Screen.drawRectangle(x, y, x + 15, y + h - 1);
-    do Screen.setColor(true);
-    return;
-}
+    /** Borra un rectángulo 16xH (útil para "borrar sprite"). */
+    function void clear16xH(int x, int y, int h) {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + 15, y + h - 1);
+        do Screen.setColor(true);
+        return;
+    }
 
-/** Borra la gota (alto 15). */
-function void eraseAttack(int x, int y) {
-    do Main.clear16xH(x, y, 15);
-    return;
-}
+    /** Borra la gota (alto 15). */
+    function void eraseAttack(int x, int y) {
+        do Main.clear16xH(x, y, 15);
+        return;
+    }
 
     function void drawBoss(int location) {
-	    var int memAddress; 
-	    let memAddress = 16384+location;
-	    // column 0
-	    do Memory.poke(memAddress, -8192);
-	    do Memory.poke(memAddress +32, -8192);
-	    do Memory.poke(memAddress +64, -8192);
-	    do Memory.poke(memAddress +96, -2048);
-	    do Memory.poke(memAddress +128, -4096);
-	    do Memory.poke(memAddress +160, -1920);
-	    do Memory.poke(memAddress +192, -256);
-	    do Memory.poke(memAddress +224, -512);
-	    do Memory.poke(memAddress +256, -4096);
-	    do Memory.poke(memAddress +288, -2048);
-	    do Memory.poke(memAddress +320, -1024);
-	    do Memory.poke(memAddress +352, -12800);
-	    do Memory.poke(memAddress +384, -15872);
-	    do Memory.poke(memAddress +416, ~32767);
-	    do Memory.poke(memAddress +448, ~32767);
-	    do Memory.poke(memAddress +512, 8128);
-	    do Memory.poke(memAddress +544, -3104);
-	    do Memory.poke(memAddress +576, 8080);
-	    do Memory.poke(memAddress +608, -512);
-	    do Memory.poke(memAddress +640, -1024);
-	    do Memory.poke(memAddress +672, -2048);
-	    do Memory.poke(memAddress +704, -6144);
-	    do Memory.poke(memAddress +736, -17408);
-	    do Memory.poke(memAddress +768, 7680);
-	    do Memory.poke(memAddress +800, 1920);
-	    do Memory.poke(memAddress +832, 576);
-	    do Memory.poke(memAddress +864, 960);
-	    do Memory.poke(memAddress +896, 288);
-	    do Memory.poke(memAddress +928, 208);
-	    do Memory.poke(memAddress +960, 144);
-	    do Memory.poke(memAddress +992, 240);
-	    do Memory.poke(memAddress +1024, -32568);
-	    do Memory.poke(memAddress +1056, -32636);
-	    do Memory.poke(memAddress +1088, -16028);
-	    do Memory.poke(memAddress +1120, -15982);
-	    do Memory.poke(memAddress +1152, -16372);
-	    do Memory.poke(memAddress +1184, -16384);
-	    do Memory.poke(memAddress +1216, -16384);
-	    do Memory.poke(memAddress +1248, -16384);
-	    do Memory.poke(memAddress +1280, -8192);
-	    do Memory.poke(memAddress +1312, -16384);
-	    do Memory.poke(memAddress +1344, -16384);
-	    do Memory.poke(memAddress +1376, -16384);
-	    do Memory.poke(memAddress +1408, -16384);
-	    do Memory.poke(memAddress +1440, -8192);
-	    do Memory.poke(memAddress +1472, -4096);
-	    do Memory.poke(memAddress +1504, -2048);
-	    do Memory.poke(memAddress +1536, -1024);
-	    do Memory.poke(memAddress +1568, 31744);
-	    // column 1
-	    do Memory.poke(memAddress +1, 4095);
-	    do Memory.poke(memAddress +33, 8191);
-	    do Memory.poke(memAddress +65, 7967);
-	    do Memory.poke(memAddress +97, 7711);
-	    do Memory.poke(memAddress +129, 7999);
-	    do Memory.poke(memAddress +161, 6591);
-	    do Memory.poke(memAddress +193, 4031);
-	    do Memory.poke(memAddress +225, 3359);
-	    do Memory.poke(memAddress +257, 3463);
-	    do Memory.poke(memAddress +289, 2561);
-	    do Memory.poke(memAddress +321, 3600);
-	    do Memory.poke(memAddress +353, 1600);
-	    do Memory.poke(memAddress +385, 1849);
-	    do Memory.poke(memAddress +417, 1923);
-	    do Memory.poke(memAddress +449, 3908);
-	    do Memory.poke(memAddress +481, 124);
-	    do Memory.poke(memAddress +513, -3842);
-	    do Memory.poke(memAddress +545, -28673);
-	    do Memory.poke(memAddress +577, -3585);
-	    do Memory.poke(memAddress +609, -227);
-	    do Memory.poke(memAddress +641, 16130);
-	    do Memory.poke(memAddress +673, 12032);
-	    do Memory.poke(memAddress +705, 32707);
-	    do Memory.poke(memAddress +737, -1280);
-	    do Memory.poke(memAddress +769, -3715);
-	    do Memory.poke(memAddress +801, 24706);
-	    do Memory.poke(memAddress +833, -16214);
-	    do Memory.poke(memAddress +865, -32581);
-	    do Memory.poke(memAddress +897, -32621);
-	    do Memory.poke(memAddress +929, 215);
-	    do Memory.poke(memAddress +961, 511);
-	    do Memory.poke(memAddress +993, 1023);
-	    do Memory.poke(memAddress +1025, 1023);
-	    do Memory.poke(memAddress +1057, 2047);
-	    do Memory.poke(memAddress +1089, 2031);
-	    do Memory.poke(memAddress +1121, 2031);
-	    do Memory.poke(memAddress +1153, 1999);
-	    do Memory.poke(memAddress +1185, 3975);
-	    do Memory.poke(memAddress +1217, 3975);
-	    do Memory.poke(memAddress +1249, 3843);
-	    do Memory.poke(memAddress +1281, 7939);
-	    do Memory.poke(memAddress +1313, 3975);
-	    do Memory.poke(memAddress +1345, 3843);
-	    do Memory.poke(memAddress +1377, 3843);
-	    do Memory.poke(memAddress +1409, 3843);
-	    do Memory.poke(memAddress +1441, 7939);
-	    do Memory.poke(memAddress +1473, 16131);
-	    do Memory.poke(memAddress +1505, 32515);
-	    do Memory.poke(memAddress +1537, -253);
-	    do Memory.poke(memAddress +1569, -1277);
-	    // column 2
-	    do Memory.poke(memAddress +514, 7);
-	    do Memory.poke(memAddress +546, 15);
-	    do Memory.poke(memAddress +578, 19);
-	    do Memory.poke(memAddress +770, 1);
-	    do Memory.poke(memAddress +802, 2);
-	    do Memory.poke(memAddress +834, 3);
-	    do Memory.poke(memAddress +866, 4);
-	    do Memory.poke(memAddress +898, 11);
-	    do Memory.poke(memAddress +930, 9);
-	    do Memory.poke(memAddress +962, 23);
-	    do Memory.poke(memAddress +994, 18);
-	    do Memory.poke(memAddress +1026, 30);
-	    do Memory.poke(memAddress +1058, 38);
-	    do Memory.poke(memAddress +1090, 66);
-	    do Memory.poke(memAddress +1122, 77);
-	    do Memory.poke(memAddress +1154, 147);
-	    do Memory.poke(memAddress +1186, 96);
-	    return;
+        var int memAddress;
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, -8192);
+        do Memory.poke(memAddress +32, -8192);
+        do Memory.poke(memAddress +64, -8192);
+        do Memory.poke(memAddress +96, -2048);
+        do Memory.poke(memAddress +128, -4096);
+        do Memory.poke(memAddress +160, -1920);
+        do Memory.poke(memAddress +192, -256);
+        do Memory.poke(memAddress +224, -512);
+        do Memory.poke(memAddress +256, -4096);
+        do Memory.poke(memAddress +288, -2048);
+        do Memory.poke(memAddress +320, -1024);
+        do Memory.poke(memAddress +352, -12800);
+        do Memory.poke(memAddress +384, -15872);
+        do Memory.poke(memAddress +416, ~32767);
+        do Memory.poke(memAddress +448, ~32767);
+        do Memory.poke(memAddress +512, 8128);
+        do Memory.poke(memAddress +544, -3104);
+        do Memory.poke(memAddress +576, 8080);
+        do Memory.poke(memAddress +608, -512);
+        do Memory.poke(memAddress +640, -1024);
+        do Memory.poke(memAddress +672, -2048);
+        do Memory.poke(memAddress +704, -6144);
+        do Memory.poke(memAddress +736, -17408);
+        do Memory.poke(memAddress +768, 7680);
+        do Memory.poke(memAddress +800, 1920);
+        do Memory.poke(memAddress +832, 576);
+        do Memory.poke(memAddress +864, 960);
+        do Memory.poke(memAddress +896, 288);
+        do Memory.poke(memAddress +928, 208);
+        do Memory.poke(memAddress +960, 144);
+        do Memory.poke(memAddress +992, 240);
+        do Memory.poke(memAddress +1024, -32568);
+        do Memory.poke(memAddress +1056, -32636);
+        do Memory.poke(memAddress +1088, -16028);
+        do Memory.poke(memAddress +1120, -15982);
+        do Memory.poke(memAddress +1152, -16372);
+        do Memory.poke(memAddress +1184, -16384);
+        do Memory.poke(memAddress +1216, -16384);
+        do Memory.poke(memAddress +1248, -16384);
+        do Memory.poke(memAddress +1280, -8192);
+        do Memory.poke(memAddress +1312, -16384);
+        do Memory.poke(memAddress +1344, -16384);
+        do Memory.poke(memAddress +1376, -16384);
+        do Memory.poke(memAddress +1408, -16384);
+        do Memory.poke(memAddress +1440, -8192);
+        do Memory.poke(memAddress +1472, -4096);
+        do Memory.poke(memAddress +1504, -2048);
+        do Memory.poke(memAddress +1536, -1024);
+        do Memory.poke(memAddress +1568, 31744);
+        // column 1
+        do Memory.poke(memAddress +1, 4095);
+        do Memory.poke(memAddress +33, 8191);
+        do Memory.poke(memAddress +65, 7967);
+        do Memory.poke(memAddress +97, 7711);
+        do Memory.poke(memAddress +129, 7999);
+        do Memory.poke(memAddress +161, 6591);
+        do Memory.poke(memAddress +193, 4031);
+        do Memory.poke(memAddress +225, 3359);
+        do Memory.poke(memAddress +257, 3463);
+        do Memory.poke(memAddress +289, 2561);
+        do Memory.poke(memAddress +321, 3600);
+        do Memory.poke(memAddress +353, 1600);
+        do Memory.poke(memAddress +385, 1849);
+        do Memory.poke(memAddress +417, 1923);
+        do Memory.poke(memAddress +449, 3908);
+        do Memory.poke(memAddress +481, 124);
+        do Memory.poke(memAddress +513, -3842);
+        do Memory.poke(memAddress +545, -28673);
+        do Memory.poke(memAddress +577, -3585);
+        do Memory.poke(memAddress +609, -227);
+        do Memory.poke(memAddress +641, 16130);
+        do Memory.poke(memAddress +673, 12032);
+        do Memory.poke(memAddress +705, 32707);
+        do Memory.poke(memAddress +737, -1280);
+        do Memory.poke(memAddress +769, -3715);
+        do Memory.poke(memAddress +801, 24706);
+        do Memory.poke(memAddress +833, -16214);
+        do Memory.poke(memAddress +865, -32581);
+        do Memory.poke(memAddress +897, -32621);
+        do Memory.poke(memAddress +929, 215);
+        do Memory.poke(memAddress +961, 511);
+        do Memory.poke(memAddress +993, 1023);
+        do Memory.poke(memAddress +1025, 1023);
+        do Memory.poke(memAddress +1057, 2047);
+        do Memory.poke(memAddress +1089, 2031);
+        do Memory.poke(memAddress +1121, 2031);
+        do Memory.poke(memAddress +1153, 1999);
+        do Memory.poke(memAddress +1185, 3975);
+        do Memory.poke(memAddress +1217, 3975);
+        do Memory.poke(memAddress +1249, 3843);
+        do Memory.poke(memAddress +1281, 7939);
+        do Memory.poke(memAddress +1313, 3975);
+        do Memory.poke(memAddress +1345, 3843);
+        do Memory.poke(memAddress +1377, 3843);
+        do Memory.poke(memAddress +1409, 3843);
+        do Memory.poke(memAddress +1441, 7939);
+        do Memory.poke(memAddress +1473, 16131);
+        do Memory.poke(memAddress +1505, 32515);
+        do Memory.poke(memAddress +1537, -253);
+        do Memory.poke(memAddress +1569, -1277);
+        // column 2
+        do Memory.poke(memAddress +514, 7);
+        do Memory.poke(memAddress +546, 15);
+        do Memory.poke(memAddress +578, 19);
+        do Memory.poke(memAddress +770, 1);
+        do Memory.poke(memAddress +802, 2);
+        do Memory.poke(memAddress +834, 3);
+        do Memory.poke(memAddress +866, 4);
+        do Memory.poke(memAddress +898, 11);
+        do Memory.poke(memAddress +930, 9);
+        do Memory.poke(memAddress +962, 23);
+        do Memory.poke(memAddress +994, 18);
+        do Memory.poke(memAddress +1026, 30);
+        do Memory.poke(memAddress +1058, 38);
+        do Memory.poke(memAddress +1090, 66);
+        do Memory.poke(memAddress +1122, 77);
+        do Memory.poke(memAddress +1154, 147);
+        do Memory.poke(memAddress +1186, 96);
+        return;
     }
 
     /** Muestra el indicador del modo actual */
@@ -376,16 +408,14 @@ function void eraseAttack(int x, int y) {
         var int i;
         // Limpiar el área del tablero (borrar todo dentro)
         do Screen.setColor(false);
-        do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX1 + 238, boxY1 + 181);
+        do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX1 + 186, boxY1 + 181);
         do Screen.setColor(true);
-        
         // Redibujar todos los ataques
         let i = 0;
         while (i < dropsCount) {
             do Main.drawAttacks(atkX[i], atkY[i]);
             let i = i + 1;
         }
-        
         // Actualizar indicador
         do Main.drawModeIndicator(true);
         return;
@@ -397,10 +427,8 @@ function void eraseAttack(int x, int y) {
         do Screen.setColor(false);
         do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX2 - 2, boxY2 - 2);
         do Screen.setColor(true);
-        
         // Dibujar la barra inicial
         do Main.drawPlayerBar(barX1, barY, barX2, barThickness);
-        
         // Actualizar indicador
         do Main.drawModeIndicator(false);
         return;
@@ -415,26 +443,20 @@ function void eraseAttack(int x, int y) {
     /** Calcula el daño basado en la posición de la barra (más centrado = más daño) */
     function int calculateDamage(int barY, int boxY1, int boxY2, int barThickness) {
         var int centerY, distance, maxDistance, damage;
-        
         // Calcular el centro del tablero
         let centerY = boxY1 + ((boxY2 - boxY1) / 2);
-        
         // Calcular el centro de la barra
         let barY = barY + (barThickness / 2);
-        
         // Calcular distancia al centro (valor absoluto)
         let distance = barY - centerY;
         if (distance < 0) {
             let distance = -distance;
         }
-        
         // La distancia máxima es la mitad de la altura del tablero
         let maxDistance = (boxY2 - boxY1) / 2;
-        
         // Calcular daño: 10 si está en el centro exacto, menos mientras más lejos
         // damage = 10 - (distance * 9 / maxDistance)
         let damage = 10 - ((distance * 9) / maxDistance);
-        
         // Asegurar que el daño esté entre 1 y 10
         if (damage < 1) {
             let damage = 1;
@@ -442,7 +464,6 @@ function void eraseAttack(int x, int y) {
         if (damage > 10) {
             let damage = 10;
         }
-        
         return damage;
     }
 
@@ -452,26 +473,20 @@ function void eraseAttack(int x, int y) {
         var boolean activeKeyboard;
         var int readKeyboard, step, minX, minY, maxX, maxY;
         var int prevKey, cooldown, repeatDelay;
-
-
         // Variables para la posición previa del jugador
         var int prevPlayerX;
         var int prevPlayerY;
-
         // Dibujar ataques
-        var Array atkX, atkY, atkVy;
-        var int dropsCount; 
+        var Array atkX, atkY, atkVy, atkVx;
+        var int dropsCount;
         var Array playerRows, attackRows;
         var int playerHitCooldown;
-
-        // Variables auxiliares 
+        // Variables auxiliares
         var int i;
         var int atkCount;
-
         // Variable para controlar el modo (true = modo jefe, false = modo jugador)
         var boolean isBossMode;
         var boolean prevUPressed;
-
         // Variables para la barra en modo jugador
         var int barY;           // Posición Y de la barra
         var int barVy;          // Velocidad vertical de la barra
@@ -481,35 +496,34 @@ function void eraseAttack(int x, int y) {
         var int barStopTimer;   // Contador para esperar antes de cambiar de modo
         var boolean prevSpacePressed; // Para detectar una sola pulsación de espacio
         var int damage;         // Variable para almacenar el daño calculado
-
         // Variables de invencibilidad
-        var boolean isInvincible;      // Si el jugador es invencible
-        var int invincibilityTimer;    // Contador de frames de invencibilidad
+        var boolean isInvincible;     // Si el jugador es invencible
+        var int invincibilityTimer;   // Contador de frames de invencibilidad
+        var int bossPhaseTimer;       // cuenta frames en modo jefe
+        var boolean isHorizontalRain; // indica si la lluvia es horizontal
 
         // Variables manejo del teclado
-        let activeKeyboard  = true;
-        let step = 2;        
+        let activeKeyboard = true;
+        let step = 2;
         let prevKey = 0;
         let cooldown = 0;
         let repeatDelay = 3;
         let isBossMode = true;  // Empezamos en modo jefe
         let prevUPressed = false;
-
         // Inicializar variables de la barra del modo jugador
         let barThickness = 3;
         let barVy = 1;  // Velocidad de movimiento (1 píxel por frame)
         let barStopped = false;
         let barStopTimer = 0;
         let prevSpacePressed = false;
-
         // Inicializar invencibilidad
         let isInvincible = false;
-        let invincibilityTimer = 0;  
+        let invincibilityTimer = 0;
 
         // Variables para el tablero
         let boxX1 = 230;
         let boxY1 = 38;
-        let boxX2 = 470;
+        let boxX2 = 420;
         let boxY2 = 221;
         let thickness = 2;
 
@@ -528,47 +542,52 @@ function void eraseAttack(int x, int y) {
         do Main.drawBossLife(bossLife);
 
         // Variables iniciales del sprite del jugador
-        let playerX1 = 450;
-        let playerY1 = 50;
+        let playerX1 = 320;  
+        let playerY1 = 130;
 
         // Límites del tablero
         let minX = boxX1 + 10;
-        let minX = 2 * ((minX + 1) / 2);   
-
-        let maxX = boxX2 - 8 - 3;          
-        let maxX = 2 * (maxX / 2);         
-
+        let minX = 2 * ((minX + 1) / 2);
+        let maxX = boxX2 - 8 - 3;
+        let maxX = 2 * (maxX / 2);
         let minY = boxY1 + 3;
         let maxY = boxY2 - 9 - 3;
 
         // Configurar la barra del modo jugador
         let barX1 = boxX1 + 10;  // Margen izquierdo
         let barX2 = boxX2 - 10;  // Margen derecho
-        let barY = boxY1 + 10;   // Posición inicial cerca del tope          
+        let barY = boxY1 + 10;   // Posición inicial cerca del tope
 
         do Screen.setColor(true);
         do Main.drawPlayer(playerX1, playerY1);
 
-        
-        let dropsCount = 6;
+        let dropsCount = 10;
         let playerHitCooldown = 0;
+
+        // Inicializamos el temporizador de fase del jefe
+        let bossPhaseTimer = 0;
+        let isHorizontalRain = false;
 
         let atkX = Array.new(dropsCount);
         let atkY = Array.new(dropsCount);
         let atkVy = Array.new(dropsCount);
+        let atkVx = Array.new(dropsCount); // <-- nuevo: velocidad horizontal (0 inicialmente)
 
         let playerRows = Main.makePlayerRows();
         let attackRows = Main.makeAttackRows();
-
-        let atkCount = dropsCount; 
+        let atkCount = dropsCount;
 
         // Posiciones iniciales (X múltiplos de 16, dentro del tablero)
-        let atkX[0] = 256;  let atkY[0] =  60;  let atkVy[0] = 1;
-        let atkX[1] = 272;  let atkY[1] =  40;  let atkVy[1] = 1;
-        let atkX[2] = 288;  let atkY[2] =  80;  let atkVy[2] = 1;
-        let atkX[3] = 304;  let atkY[3] =  120;  let atkVy[3] = 1;
-        let atkX[4] = 320;  let atkY[4] = 100;  let atkVy[4] = 1;
-        let atkX[5] = 336;  let atkY[5] =  50;  let atkVy[5] = 1;
+        let atkX[0] = 256;  let atkY[0] = 60;   let atkVy[0] = 1; let atkVx[0] = 0;
+        let atkX[1] = 272;  let atkY[1] = 40;   let atkVy[1] = 1; let atkVx[1] = 0;
+        let atkX[2] = 288;  let atkY[2] = 80;   let atkVy[2] = 1; let atkVx[2] = 0;
+        let atkX[3] = 304;  let atkY[3] = 120;  let atkVy[3] = 1; let atkVx[3] = 0;
+        let atkX[4] = 320;  let atkY[4] = 100;  let atkVy[4] = 1; let atkVx[4] = 0;
+        let atkX[5] = 336;  let atkY[5] = 50;   let atkVy[5] = 1; let atkVx[5] = 0;
+        let atkX[6] = 352;  let atkY[6] = 70;   let atkVy[6] = 1; let atkVx[6] = 0;
+        let atkX[7] = 368;  let atkY[7] = 90;   let atkVy[7] = 1; let atkVx[7] = 0;
+        let atkX[8] = 384;  let atkY[8] = 110;  let atkVy[8] = 1; let atkVx[8] = 0;
+        let atkX[9] = 400;  let atkY[9] = 60;   let atkVy[9] = 1; let atkVx[9] = 0;
 
         // Dibujo inicial de las 6 gotas
         let i = 0;
@@ -582,25 +601,50 @@ function void eraseAttack(int x, int y) {
 
         while (activeKeyboard){
             let readKeyboard = Keyboard.keyPressed();
-            if (~(readKeyboard = 0) & ~(readKeyboard = prevKey)) { let cooldown = 0; }
-            if (cooldown > 0) { let cooldown = cooldown - 1; }
 
-            // Detectar tecla U (código 117) para cambiar de modo
+            if (~(readKeyboard = 0) & ~(readKeyboard = prevKey)) {
+                let cooldown = 0;
+            }
+            if (cooldown > 0) {
+                let cooldown = cooldown - 1;
+            }
+
+            // Detectar tecla U (código 85) para cambiar de modo
             if (readKeyboard = 85) {
                 if (~prevUPressed) {
                     // Debug: mostrar que se detectó la tecla
                     do Output.moveCursor(20, 0);
-                    do Output.printString("U presionada!   ");
-                    
+                    do Output.printString("U presionada!               ");
+
                     if (isBossMode) {
-                        // Cambiar a modo jugador
+                        // Cambiar a modo jugador (manual)
                         do Main.switchToPlayerMode(boxX1, boxY1, boxX2, boxY2, barX1, barY, barX2, barThickness);
                         let isBossMode = false;
                         // Resetear estado de la barra
                         let barStopped = false;
                         let barStopTimer = 0;
                     } else {
-                        // Cambiar a modo jefe
+                        // Cambiar a modo jefe (manual): resetear timer y estado de lluvia
+                        // Restaurar movimiento vertical de las gotas y reiniciar temporizador
+                        let i = 0;
+                        while (i < dropsCount) {
+                            let atkVy[i] = 1;
+                            let atkVx[i] = 0;
+                            let i = i + 1;
+                        }
+                        let bossPhaseTimer = 0;
+                        let isHorizontalRain = false;
+                        // Reposicionar ataques dentro de la nueva caja
+                        let atkX[0] = 256;  let atkY[0] = 60;
+                        let atkX[1] = 272;  let atkY[1] = 40;
+                        let atkX[2] = 288;  let atkY[2] = 80;
+                        let atkX[3] = 304;  let atkY[3] = 120;
+                        let atkX[4] = 320;  let atkY[4] = 100;
+                        let atkX[5] = 336;  let atkY[5] = 50;
+                        let atkX[6] = 352;  let atkY[6] = 70;
+                        let atkX[7] = 368;  let atkY[7] = 90;
+                        let atkX[8] = 384;  let atkY[8] = 110;
+                        let atkX[9] = 400;  let atkY[9] = 60;
                         do Main.switchToBossMode(atkX, atkY, dropsCount, boxX1, boxY1);
                         let isBossMode = true;
                     }
@@ -612,46 +656,54 @@ function void eraseAttack(int x, int y) {
 
             // Left
             if (readKeyboard = 130){
-                if (cooldown = 0) {  
+                if (cooldown = 0) {
                     do Main.eraseplayer(playerX1, playerY1);
                     let playerX1 = playerX1 - step;
-                    if (playerX1 < minX) { let playerX1 = minX; }
+                    if (playerX1 < minX) {
+                        let playerX1 = minX;
+                    }
                     do Main.drawPlayer(playerX1, playerY1);
                     let cooldown = repeatDelay;
-                }   
+                }
             }
 
             // Up
             if (readKeyboard = 131){
-                if (cooldown = 0) {  
+                if (cooldown = 0) {
                     do Main.eraseplayer(playerX1, playerY1);
                     let playerY1 = playerY1 - step;
-                    if (playerY1 < minY) { let playerY1 = minY; }
+                    if (playerY1 < minY) {
+                        let playerY1 = minY;
+                    }
                     do Main.drawPlayer(playerX1, playerY1);
                     let cooldown = repeatDelay;
-                }   
+                }
             }
-        
+
             // Right
-            if (readKeyboard = 132) {
-                if (cooldown = 0) {  
+            if (readKeyboard =132) {
+                if (cooldown = 0) {
                     do Main.eraseplayer(playerX1, playerY1);
                     let playerX1 = playerX1 + step;
-                    if (playerX1 > maxX) { let playerX1 = maxX; }
+                    if (playerX1 > maxX) {
+                        let playerX1 = maxX;
+                    }
                     do Main.drawPlayer(playerX1, playerY1);
                     let cooldown = repeatDelay;
-                }   
+                }
             }
-        
+
             // Down
             if (readKeyboard = 133){
-                if (cooldown = 0) {  
+                if (cooldown = 0) {
                     do Main.eraseplayer(playerX1, playerY1);
                     let playerY1 = playerY1 + step;
-                    if (playerY1 > maxY) { let playerY1 = maxY; }
+                    if (playerY1 > maxY) {
+                        let playerY1 = maxY;
+                    }
                     do Main.drawPlayer(playerX1, playerY1);
                     let cooldown = repeatDelay;
-                }  
+                }
             }
 
             // Actualizamos la posición previa del jugador para el siguiente ciclo
@@ -660,36 +712,124 @@ function void eraseAttack(int x, int y) {
 
             // Solo actualizar y dibujar ataques si estamos en modo jefe
             if (isBossMode) {
+                // Incrementar temporizador de fase del jefe
+                let bossPhaseTimer = bossPhaseTimer + 1;
+
+                // Si alcanza 7 segundos -> cambiar a lluvia horizontal
+                // (7s = 3500 frames)
+                if (bossPhaseTimer = 3500) {
+                    // Activar modo horizontal: detener velocidad vertical y mover horizontalmente
+                    let isHorizontalRain = true;
+                    // LIMPIAR COMPLETAMENTE el área del tablero
+                    do Screen.setColor(false);
+                    do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX2 - 2, boxY2 - 2);
+                    do Screen.setColor(true);
+                    // Reposicionar todas las gotas en el borde izquierdo espaciadas
+                    let atkX[0] = boxX1 + 50;
+                    let atkY[0] = boxY1 + 20;
+                    let atkX[1] = boxX1 + 20;
+                    let atkY[1] = boxY1 + 50;
+                    let atkX[2] = boxX1 + 30;
+                    let atkY[2] = boxY1 + 80;
+                    let atkX[3] = boxX1 + 40;
+                    let atkY[3] = boxY1 + 110;
+                    let atkX[4] = boxX1 + 45;
+                    let atkY[4] = boxY1 + 140;
+                    let atkX[5] = boxX1 + 35;
+                    let atkY[5] = boxY1 + 150;
+                    let i = 0;
+                    while (i < dropsCount) {
+                        let atkVy[i] = 0;
+                        let atkVx[i] = 2;
+                        let i = i + 1;
+                        }
+                    // Indicar en debug
+                    do Output.moveCursor(22, 0);
+                    do Output.printString("Lluvia horizontal!");
+                    }
+
+                // Si alcanza 15 segundos (7s vertical + 8s horizontal) -> cambiar automáticamente a modo jugador
+                // 15s = 7500 frames
+                if ((bossPhaseTimer > 7499) | (bossPhaseTimer = 7500)) {
+    // Limpiar TODO
+    do Screen.setColor(false);
+    do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX2 - 2, boxY2 - 2);
+    do Screen.setColor(true);
+    
+    // Cambio automático a modo jugador
+    do Main.switchToPlayerMode(boxX1, boxY1, boxX2, boxY2, barX1, barY, barX2, barThickness);
+    let isBossMode = false;
+    let bossPhaseTimer = 0;
+    let isHorizontalRain = false;
+    
+    // Resetear TODO a posiciones originales
+    let atkX[0] = 256;  let atkY[0] = 60;   let atkVy[0] = 1; let atkVx[0] = 0;
+    let atkX[1] = 272;  let atkY[1] = 40;   let atkVy[1] = 1; let atkVx[1] = 0;
+    let atkX[2] = 288;  let atkY[2] = 80;   let atkVy[2] = 1; let atkVx[2] = 0;
+    let atkX[3] = 304;  let atkY[3] = 120;  let atkVy[3] = 1; let atkVx[3] = 0;
+    let atkX[4] = 320;  let atkY[4] = 100;  let atkVy[4] = 1; let atkVx[4] = 0;
+    let atkX[5] = 336;  let atkY[5] = 50;   let atkVy[5] = 1; let atkVx[5] = 0;
+    let atkX[6] = 352;  let atkY[6] = 70;   let atkVy[6] = 1; let atkVx[6] = 0;
+    let atkX[7] = 368;  let atkY[7] = 90;   let atkVy[7] = 1; let atkVx[7] = 0;
+    let atkX[8] = 384;  let atkY[8] = 110;  let atkVy[8] = 1; let atkVx[8] = 0;
+    let atkX[9] = 400;  let atkY[9] = 60;   let atkVy[9] = 1; let atkVx[9] = 0;
+}
+
                 let i = 0;
                 while (i < atkCount) {
                     // Borrar la gota en su posición anterior
                     do Main.eraseAttack(atkX[i], atkY[i]);
-
-                    // Actualizar la posición de la gota
-                    let atkY[i] = atkY[i] + atkVy[i];
-
-                    // Si la gota ha salido de la pantalla, hacer respawn en la parte superior
-                    if (atkY[i] > (boxY2 - 15)) {
-                        let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
+                    if (~isHorizontalRain) {
+                        // ========== MODO VERTICAL ==========
+                        // Borrar el ataque en su posición anterior
+                        do Main.eraseAttack(atkX[i], atkY[i]);
+                        let atkY[i] = atkY[i] + atkVy[i];
+                        // Si la gota ha salido de la pantalla, hacer respawn en la parte superior
+                        if (atkY[i] > (boxY2 - 15)) {
+                            let atkY[i] = boxY1 + 4;
+                            }
+                            // Comprobar colisión con el jugador (solo si NO es invencible)
+                            if (Main.collideSweepDownAligned16(playerX1, playerY1, playerRows,
+                            atkX[i], atkY[i], atkVy[i], attackRows)) {
+                                if (~isInvincible) {
+                                    let playerLife = Main.playerDamage(playerLife, 3);
+                                    let atkY[i] = boxY1 + 4;
+                                    let isInvincible = true;
+                                    let invincibilityTimer = 500;
+                                    }
+                                }
+                            // Redibujar la gota
+                            do Main.drawAttacks(atkX[i], atkY[i]);
+                                    } 
+                else {
+                    // ========== MODO HORIZONTAL ==========
+                    // Limpiar toda la línea donde está la gota
+                    do Screen.setColor(false);
+                    do Screen.drawRectangle(boxX1 + 2, atkY[i], boxX2 - 2, atkY[i] + 14);
+                    do Screen.setColor(true);
+                    let atkX[i] = atkX[i] + atkVx[i];
+                    // Si la gota sale por la derecha del área, reaparece por la izquierda
+                 // Si la gota sale por la derecha del área, reaparece por la izquierda
+                 if (atkX[i] > (boxX2 - 16)) {
+                    let atkX[i] = boxX1 + 20;
                     }
-
-                    // Comprobar colisión con el jugador (solo si NO es invencible)
-                    if (Main.collideSweepDownAligned16(playerX1, playerY1, playerRows, atkX[i], atkY[i], atkVy[i], attackRows)) {
-                        if (~isInvincible) {
-                            // Si hay colisión y no es invencible, aplicar daño
-                            let playerLife = Main.playerDamage(playerLife, 3);
-                            do Main.eraseAttack(atkX[i], atkY[i]);  // Borra la gota
-                            let atkY[i] = boxY1 + 4;  // Reaparece desde la parte superior
-                            
-                            // Activar invencibilidad por 1 segundo (500 frames * 2ms = 1000ms)
-                            let isInvincible = true;
-                            let invincibilityTimer = 200;
+                    if (atkX[i] < (boxX1 + 20)) {
+                        let atkX[i] = boxX2 - 32;
                         }
-                    }
+                        // Para colisión horizontal a baja velocidad comprobamos la colisión alineada
+                        if (Main.collideAligned16(playerX1, playerY1, playerRows,
+                        atkX[i], atkY[i], attackRows)) {
+                            if (~isInvincible) {
+                                let playerLife = Main.playerDamage(playerLife, 3);
+                                let atkX[i] = boxX1 + 4;
+                                let isInvincible = true;
+                                let invincibilityTimer = 500;
+                                }
+                            }
+                            // Redibujar la gota
+                            do Main.drawAttacks(atkX[i], atkY[i]);
+                            }
 
-                    // Redibujar la gota
-                    do Main.drawAttacks(atkX[i], atkY[i]);
-                
                     // Borra al jugador solo si se mueve
                     if (~(playerX1 = prevPlayerX) | ~(playerY1 = prevPlayerY)) {
                         do Main.eraseplayer(prevPlayerX, prevPlayerY);
@@ -712,20 +852,20 @@ function void eraseAttack(int x, int y) {
                 if (readKeyboard = 32) {
                     if (~prevSpacePressed & ~barStopped) {
                         let barStopped = true;
-                        let barStopTimer = 500;  // 500 frames * 2ms = 1000ms = 1 segundo
+                        let barStopTimer = 500; // 500 frames * 2ms = 1000ms = 1 segundo
                         let prevSpacePressed = true;
-                        
+
                         // Calcular el daño según la posición de la barra
                         let damage = Main.calculateDamage(barY, boxY1, boxY2, barThickness);
-                        
+
                         // Aplicar daño al jefe
                         let bossLife = Main.bossDamage(bossLife, damage);
-                        
+
                         // Debug: mostrar el daño aplicado
                         do Output.moveCursor(19, 0);
                         do Output.printString("Danio: ");
                         do Output.printInt(damage);
-                        do Output.printString("     ");
+                        do Output.printString("  ");
                     }
                 } else {
                     let prevSpacePressed = false;
@@ -734,13 +874,22 @@ function void eraseAttack(int x, int y) {
                 // Si la barra está detenida, decrementar el temporizador
                 if (barStopped) {
                     let barStopTimer = barStopTimer - 1;
-                    
+
                     // Cuando el temporizador llega a 0, cambiar a modo jefe
                     if (barStopTimer < 1) {
                         do Main.switchToBossMode(atkX, atkY, dropsCount, boxX1, boxY1);
                         let isBossMode = true;
                         let barStopped = false;
                         let barStopTimer = 0;
+                        // Cuando volvemos a modo jefe manualmente, reiniciar timer y lluvia vertical
+                        let bossPhaseTimer = 0;
+                        let isHorizontalRain = false;
+                        let i = 0;
+                        while (i < dropsCount) {
+                            let atkVy[i] = 1;
+                            let atkVx[i] = 0;
+                            let i = i + 1;
+                        }
                     }
                 } else {
                     // Solo mover la barra si NO está detenida
@@ -753,11 +902,11 @@ function void eraseAttack(int x, int y) {
                     // Comprobar rebotes en los límites del tablero
                     if (barY < (boxY1 + 5)) {
                         let barY = boxY1 + 5;
-                        let barVy = 1;  // Cambiar dirección hacia abajo
+                        let barVy = 1; // Cambiar dirección hacia abajo
                     }
                     if (barY > (boxY2 - barThickness - 5)) {
                         let barY = boxY2 - barThickness - 5;
-                        let barVy = -1;  // Cambiar dirección hacia arriba (negativo)
+                        let barVy = -1; // Cambiar dirección hacia arriba (negativo)
                     }
 
                     // Dibujar la barra en su nueva posición
@@ -773,7 +922,7 @@ function void eraseAttack(int x, int y) {
                     let invincibilityTimer = 0;
                 }
             }
-        
+
             let prevKey = readKeyboard;
             do Sys.wait(2);
         }
