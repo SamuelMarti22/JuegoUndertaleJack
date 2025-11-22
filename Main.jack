@@ -40,7 +40,7 @@ class Main {
         do Screen.drawRectangle(0, 0, 511, 255);
         do Screen.setColor(true);
         do Output.moveCursor(11, 26);
-        do Output.printString("Perdiste");
+        do Output.printString("!!GAME OVER!!");
         return;
     }
 
@@ -51,7 +51,7 @@ class Main {
         do Screen.drawRectangle(0, 0, 511, 255);
         do Screen.setColor(true);
         do Output.moveCursor(11, 27);
-        do Output.printString("Ganaste");
+        do Output.printString("!!YOU WIN!!");
         return;
     }
 
@@ -717,7 +717,7 @@ class Main {
 
                 // Si alcanza 7 segundos -> cambiar a lluvia horizontal
                 // (7s = 3500 frames)
-                if (bossPhaseTimer = 3500) {
+                if (bossPhaseTimer = 900) {
                     // Activar modo horizontal: detener velocidad vertical y mover horizontalmente
                     let isHorizontalRain = true;
                     // LIMPIAR COMPLETAMENTE el área del tablero
@@ -750,7 +750,7 @@ class Main {
 
                 // Si alcanza 15 segundos (7s vertical + 8s horizontal) -> cambiar automáticamente a modo jugador
                 // 15s = 7500 frames
-                if ((bossPhaseTimer > 7499) | (bossPhaseTimer = 7500)) {
+                if ((bossPhaseTimer > 1799) | (bossPhaseTimer = 1800)) {
     // Limpiar TODO
     do Screen.setColor(false);
     do Screen.drawRectangle(boxX1 + 2, boxY1 + 2, boxX2 - 2, boxY2 - 2);
